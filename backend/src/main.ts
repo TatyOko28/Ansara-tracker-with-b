@@ -1,3 +1,4 @@
+// src/main.ts
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -6,26 +7,29 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Configuration CORS
+  // 🔹 Configuration CORS
   app.enableCors({
-    origin: ['http://localhost:3000'], // Autorise uniquement votre front Next.js
-    credentials: true,                // Autorise les cookies/sessions
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Méthodes autorisées
-    allowedHeaders: 'Content-Type,Authorization', // Headers autorisés
+    origin: [
+      'http://localhost:3000',          // Front local
+      process.env.FRONTEND_URL || ''    // URL front en prod (Vercel, etc.)
+    ].filter(Boolean),
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
   });
 
-  // Configuration Swagger
+  // 🔹 Configuration Swagger
   const config = new DocumentBuilder()
     .setTitle('ANSARA TRACKER')
-    .setDescription('ANSARA TRACKER - is the time tracker')
+    .setDescription('ANSARA TRACKER - Time Tracker API')
     .setVersion('1.0')
     .addTag('ANSARA')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
-        bearerFormat: 'jwt',
-        name: 'jwt',
+        bearerFormat: 'JWT',
+        name: 'JWT',
         description: 'Enter your JWT token',
         in: 'header',
       },
@@ -36,10 +40,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // Validation globale
-  app.useGlobalPipes(new ValidationPipe());
+  // 🔹 Validation globale
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  await app.listen(process.env.PORT ?? 3001);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  // 🔹 Port et lancement
+  const port = process.env.PORT ?? 3001;
+  await app.listen(port);
+  console.log(`🚀 Application is running on: ${await app.getUrl()}`);
 }
+
 bootstrap();

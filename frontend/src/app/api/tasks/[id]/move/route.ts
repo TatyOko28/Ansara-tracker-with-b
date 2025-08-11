@@ -1,15 +1,16 @@
 // src/app/api/tasks/[id]/move/route.ts
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } } // ✅ Correct pour Next.js App Router
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
 
+  // OK d'utiliser cookies() dans un Route Handler (en Next 15, c'est async)
   const token = (await cookies()).get('access_token')?.value;
   const body = await req.json();
 
