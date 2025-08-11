@@ -5,8 +5,8 @@ import { cookies } from 'next/headers';
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: { id: string } } // ✅ Correct pour Next.js App Router
 ) {
   const { id } = params;
 
