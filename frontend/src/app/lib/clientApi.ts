@@ -10,7 +10,7 @@ export async function createTask(dto: {
 }) {
   const r = await fetch('/api/tasks', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, // optionnel (ton proxy remet aussi)
+    headers: { 'Content-Type': 'application/json' }, 
     body: JSON.stringify(dto),
   });
 
@@ -22,7 +22,7 @@ export async function createTask(dto: {
   }
 
   toast.success('Tâche créée');
-  return data; // la tâche créée renvoyée par ton backend
+  return data; 
 }
 
 export async function loadTasks() {

@@ -1,4 +1,3 @@
-// src/main.ts
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -7,10 +6,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // 🔹 Configuration CORS
   const corsOrigins = [
-    'http://localhost:3000',               // Front local
-    process.env.FRONTEND_URL || ''         // URL front en prod (Vercel, etc.)
+    'http://localhost:3000',               
+    process.env.FRONTEND_URL || ''         
   ].filter(Boolean);
 
   app.enableCors({
@@ -22,7 +20,6 @@ async function bootstrap() {
 
   console.log(`✅ CORS origins: ${JSON.stringify(corsOrigins)}`);
 
-  // 🔹 Configuration Swagger
   const config = new DocumentBuilder()
     .setTitle('ANSARA TRACKER')
     .setDescription('ANSARA TRACKER - Time Tracker API')
@@ -44,12 +41,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  // 🔹 Validation globale
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  // 🔹 Port et lancement
   const port = Number(process.env.PORT) || 3001;
-  await app.listen(port, '0.0.0.0'); // 0.0.0.0 = accepte connexions externes
+  await app.listen(port, '0.0.0.0'); 
   console.log(`🚀 Application is running on: ${await app.getUrl()}`);
 }
 

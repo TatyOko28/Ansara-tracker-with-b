@@ -24,7 +24,6 @@ function SignInForm() {
   useEffect(() => {
     if (state?.ok) {
       toast.success('Connexion réussie');
-      // le cookie httpOnly est déjà posé côté serveur
       router.replace(callbackUrl);
     } else if (state?.error) {
       toast.error(state.error);

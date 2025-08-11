@@ -45,13 +45,12 @@ export async function signInAction(
 
     (await cookies()).set('access_token', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? true : false, // false en dev
+      secure: process.env.NODE_ENV === 'production' ? true : false, 
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24,
     });
 
-    // Redirection serveur immédiate -> plus de boucle sur /signin
     redirect('/tasks');
   } catch (e: any) {
     return { ok: false, error: e?.message || 'Erreur de connexion' };

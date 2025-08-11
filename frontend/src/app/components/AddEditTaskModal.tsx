@@ -5,8 +5,8 @@ import { Category, Task } from '../lib/types';
 import { toast } from 'sonner';
 
 interface Props {
-  initial?: Task; // si présent => mode édition
-  onSubmit?: (task: Task) => void; // callback local optionnel
+  initial?: Task; 
+  onSubmit?: (task: Task) => void; 
   onClose: () => void;
 }
 
@@ -34,7 +34,6 @@ export default function AddEditTaskModal({ initial, onSubmit, onClose }: Props) 
     try {
       let res;
       if (initial) {
-        // EDITION
         res = await fetch(`/api/tasks/${initial.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -46,7 +45,6 @@ export default function AddEditTaskModal({ initial, onSubmit, onClose }: Props) 
           }),
         });
       } else {
-        // CREATION
         res = await fetch(`/api/tasks`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -67,7 +65,6 @@ export default function AddEditTaskModal({ initial, onSubmit, onClose }: Props) 
       const saved = await res.json();
       toast.success(initial ? 'Tâche mise à jour' : 'Tâche créée');
 
-      // Mettre à jour le state local si callback fourni
       if (onSubmit) {
         onSubmit({
           id: saved.id,

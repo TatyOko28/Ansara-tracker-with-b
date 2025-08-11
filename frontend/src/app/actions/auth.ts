@@ -22,7 +22,7 @@ export async function signInAction(
 ): Promise<ActionState> {
   try {
     const payload = {
-      email: String(formData.get('login') || ''),     // champ "login" = email
+      email: String(formData.get('login') || ''),     
       password: String(formData.get('password') || ''),
     };
 
@@ -48,7 +48,6 @@ export async function signInAction(
       return { ok: false, error: 'Réponse inattendue: pas de token' };
     }
 
-    // Écrit le cookie et redirige côté serveur pour éviter la course avec la navigation client
     (await cookies()).set('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -59,7 +58,6 @@ export async function signInAction(
 
     redirect('/tasks');
   } catch (e: any) {
-    // Ne pas avaler la redirection Next.js (différents formats possibles)
     if (e?.digest === 'NEXT_REDIRECT' || e?.message === 'NEXT_REDIRECT' || e === 'NEXT_REDIRECT') {
       throw e;
     }

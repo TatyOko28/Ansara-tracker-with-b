@@ -31,7 +31,6 @@ export default function CompletedList({ completed, onAdd }: CompletedListProps) 
     );
   }
 
-  // Group by date label, newest date first, tasks inside newest first
   const groupsMap = completed.reduce((map, item) => {
     const arr = map.get(item.date) || [];
     arr.push(item);

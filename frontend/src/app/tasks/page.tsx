@@ -21,10 +21,10 @@ import {
 type ApiTask = {
   id: string;
   title: string;
-  category: string; // backend enum string
+  category: string; 
   status: 'PLANNED' | 'IN_PROGRESS' | 'DONE';
-  startTime?: string | null; // ISO
-  endTime?: string | null;   // ISO
+  startTime?: string | null; 
+  endTime?: string | null;   
   description?: string | null;
 };
 
@@ -50,11 +50,9 @@ function getDateGroupLabel(date: Date): string {
 }
 
 export default function TasksPage() {
-  // --- State principal ---
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- UI ---
   const [openCat, setOpenCat] = useState<Record<string, boolean>>({
     TODAY: true,
     EVENING: false,
@@ -65,7 +63,6 @@ export default function TasksPage() {
   const [showEdit, setShowEdit] = useState<null | Task>(null);
   const [showComplete, setShowComplete] = useState<null | string>(null);
 
-  // --- NowDoing (tâche en cours) ---
   const current = useMemo(() => {
     const t = tasks.find(x => (x as any).status === 'IN_PROGRESS');
     if (!t) return null;
@@ -84,10 +81,9 @@ export default function TasksPage() {
     return () => clearInterval(id);
   }, [current]);
 
-  // --- CompletedList (à partir des tâches terminées) ---
   const completed: CompletedTask[] = useMemo(() => {
     const done = (tasks as any as ApiTask[])
-      .filter(t => t.endTime) // on prend celles qui ont une fin
+      .filter(t => t.endTime) 
       .map<CompletedTask>(t => {
         const start = t.startTime ? new Date(t.startTime) : new Date();
         const end = t.endTime ? new Date(t.endTime) : new Date();
@@ -99,23 +95,19 @@ export default function TasksPage() {
           date: getDateGroupLabel(start),
         };
       });
-    // On trie par date de fin décroissante (optionnel)
     return done.sort((a, b) => +new Date(b.end) - +new Date(a.end));
   }, [tasks]);
 
-  // --- Charger les tâches ---
   async function loadTasks() {
     try {
       const res = await fetch('/api/tasks', { cache: 'no-store' });
       if (!res.ok) throw new Error(await res.text());
       const data: ApiTask[] = await res.json();
 
-      // Map -> Task pour l’UI + conserver status/startTime/endTime en properties annexes
       const mapped: Task[] = data.map(t => ({
         id: t.id,
         text: t.title,
         category: t.category,
-        // on attache les champs backend à l'objet (TS tolère via indexer any au-dessus)
         ...(t as any),
       })) as any;
 
@@ -131,7 +123,6 @@ export default function TasksPage() {
     loadTasks();
   }, []);
 
-  // --- Actions ---
   function handleTaskSaved(task: Task) {
     setTasks(prev => {
       const i = prev.findIndex(x => x.id === task.id);
@@ -150,7 +141,6 @@ export default function TasksPage() {
 
   async function handleStart(task: Task) {
     if (await apiStartTask(task.id)) {
-      // Mettre toutes les autres à PLANNED
       setTasks(prev =>
         prev.map(t =>
           t.id === task.id
@@ -163,7 +153,6 @@ export default function TasksPage() {
 
   async function handleStop(task: Task) {
     if (await apiStopTask(task.id)) {
-      // On stoppe et on fixe endTime = now (au minimum, le backend peut renvoyer un endTime exact)
       const endIso = new Date().toISOString();
       setTasks(prev =>
         prev.map(t =>
@@ -183,31 +172,28 @@ export default function TasksPage() {
     if (!ok) setTasks(prev);
   }
 
-  // Ajout via CompleteTaskModal (manuel avec heures)
   async function handleAddCompletedManual(text: string, dateStr: string, start: string, end: string) {
     try {
-      // Construire des ISO depuis la date choisie + heures choisies
       const startIso = `${dateStr}T${start}`;
       const endIso = `${dateStr}T${end}`;
 
       const ok = await apiAddCompletedTask({
         title: text,
         description: '',
-        category: 'TODAY', // ou derive de l'UI si tu veux
+        category: 'TODAY',
         startTime: startIso,
         endTime: endIso,
       });
 
       if (ok) {
         setShowComplete(null);
-        await loadTasks(); // recharger pour refléter immédiatement
+        await loadTasks(); 
       }
     } catch (e: any) {
       toast.error(e?.message || 'Erreur ajout terminé');
     }
   }
 
-  // --- RENDER ---
   if (loading) return <div className="p-6 text-white">Chargement…</div>;
 
   const today = new Date();
@@ -228,7 +214,6 @@ export default function TasksPage() {
 
   return (
     <div className="flex h-screen bg-black text-white p-8 gap-8">
-      {/* Colonne Plan */}
       <div className="w-1/3">
         <div className="flex justify-between items-center mb-4 text-blue-400 text-xl">
           <h2>План</h2>
@@ -236,12 +221,10 @@ export default function TasksPage() {
         </div>
 
         {CATEGORY_ORDER.map(cat => {
-          // Sélectionner les tâches de la catégorie uniquement non terminées (DONE avec endTime exclus)
           const inCat = tasks.filter(
             t => (t as any).category === cat && ((t as any).status !== 'DONE' || !(t as any).endTime)
           );
 
-          // Construire des groupes par date (au jour) basés sur startTime si présent, sinon createAt
           type Group = { key: string; label: string; date: Date; items: Task[] };
           const groupsMap = new Map<string, Group>();
           for (const t of inCat) {
@@ -254,9 +237,7 @@ export default function TasksPage() {
             groupsMap.set(key, g);
           }
 
-          // Ordonner les groupes du plus récent au plus ancien
           const groups = Array.from(groupsMap.values()).sort((a, b) => b.date.getTime() - a.date.getTime());
-          // Trier les tâches de chaque groupe du plus récent au plus ancien
           for (const g of groups) {
             g.items.sort((a, b) => {
               const ia = (a as any).startTime || (a as any).createAt || 0;
@@ -313,7 +294,6 @@ export default function TasksPage() {
         })}
       </div>
 
-      {/* Colonne droite : NowDoing + Completed */}
       <div className="w-2/3 flex flex-col gap-6 bg-black">
         <NowDoing current={current} elapsed={elapsed} onStop={() => current && handleStop(current.task)} />
         <CompletedList
@@ -322,7 +302,6 @@ export default function TasksPage() {
         />
       </div>
 
-      {/* Modals */}
       {showAdd && (
         <AddEditTaskModal
           onClose={() => setShowAdd(false)}
