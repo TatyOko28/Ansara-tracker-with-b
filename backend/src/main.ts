@@ -8,15 +8,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // 🔹 Configuration CORS
+  const corsOrigins = [
+    'http://localhost:3000',               // Front local
+    process.env.FRONTEND_URL || ''         // URL front en prod (Vercel, etc.)
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: [
-      'http://localhost:3000',          // Front local
-      process.env.FRONTEND_URL || ''    // URL front en prod (Vercel, etc.)
-    ].filter(Boolean),
+    origin: corsOrigins,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
   });
+
+  console.log(`✅ CORS origins: ${JSON.stringify(corsOrigins)}`);
 
   // 🔹 Configuration Swagger
   const config = new DocumentBuilder()
@@ -44,8 +48,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   // 🔹 Port et lancement
-  const port = process.env.PORT ?? 3001;
-  await app.listen(port);
+  const port = Number(process.env.PORT) || 3001;
+  await app.listen(port, '0.0.0.0'); // 0.0.0.0 = accepte connexions externes
   console.log(`🚀 Application is running on: ${await app.getUrl()}`);
 }
 

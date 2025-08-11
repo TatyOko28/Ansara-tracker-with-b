@@ -1,0 +1,36 @@
+# Node / build
+node_modules
+dist
+npm-debug.log*
+yarn-error.log*
+.pnpm-store
+
+# Git / IDE
+.git
+.gitignore
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env & secrets (tu les définis dans Render)
+.env
+.env.*
+!.env.example
+
+# Tests / coverage
+coverage
+*.spec.ts
+*.test.ts
+jest.config.*
+
+# Next.js du monorepo (au cas où)
+../frontend/.next
+../frontend/node_modules
+../frontend/dist
+
+# Prisma: garder le dossier prisma/ (migrations), mais ignorer d'éventuelles DB locales
+prisma/*.db
+prisma/*.db-journal
