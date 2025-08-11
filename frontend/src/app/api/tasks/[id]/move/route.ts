@@ -1,16 +1,15 @@
-// src/app/api/tasks/[id]/move/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+interface RouteContext {
+  params: { id: string };
+}
 
-  // OK d'utiliser cookies() dans un Route Handler (en Next 15, c'est async)
+export async function PATCH(req: NextRequest, context: RouteContext) {
+  const { id } = context.params;
+
   const token = (await cookies()).get('access_token')?.value;
   const body = await req.json();
 
@@ -29,7 +28,10 @@ export async function PATCH(
     return map[c] ?? c;
   };
 
-  const forwarded = { ...body, category: normalizeCategory((body as any)?.category) };
+  const forwarded = {
+    ...body,
+    category: normalizeCategory((body as any)?.category),
+  };
 
   const r = await fetch(`${API}/tasks/${id}/move`, {
     method: 'PATCH',
