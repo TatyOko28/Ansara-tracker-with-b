@@ -74,6 +74,8 @@ export default function AddEditTaskModal({ initial, onSubmit, onClose }: Props) 
           text: saved.title,
           category: saved.category,
           status: saved.status,
+          startTime: saved.startTime,
+          endTime: saved.endTime,
         });
       }
 
@@ -111,13 +113,13 @@ export default function AddEditTaskModal({ initial, onSubmit, onClose }: Props) 
         <div className="grid grid-cols-2 gap-2 mt-2">
           <input
             type="date"
-            className="w-full p-2 bg-gray-700 rounded"
+            className="w-full p-2 bg-gray-700 text-white rounded appearance-none"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
           <input
             type="time"
-            className="w-full p-2 bg-gray-700 rounded"
+            className="w-full p-2 bg-gray-700 text-white rounded appearance-none"
             value={time}
             onChange={(e) => setTime(e.target.value)}
           />

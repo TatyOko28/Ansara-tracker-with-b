@@ -9,6 +9,9 @@ export interface Task {
   id: string;
   text: string;
   category: Category;
+  status?: 'PLANNED' | 'IN_PROGRESS' | 'DONE';
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface CompletedTask {

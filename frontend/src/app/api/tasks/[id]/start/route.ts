@@ -1,16 +1,16 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-interface RouteContext {
-  params: { id: string };
-}
-
-export async function PATCH(_req: NextRequest, context: RouteContext) {
+export async function PATCH(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const token = (await cookies()).get('access_token')?.value;
 
-  const r = await fetch(`${API}/tasks/${context.params.id}/start`, {
+  const r = await fetch(`${API}/tasks/${id}/start`, {
     method: 'PATCH',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

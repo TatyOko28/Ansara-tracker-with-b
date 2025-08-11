@@ -1,16 +1,16 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-interface RouteContext {
-  params: { id: string };
-}
-
-export async function DELETE(_req: NextRequest, context: RouteContext) {
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const token = (await cookies()).get('access_token')?.value;
 
-  const r = await fetch(`${API}/tasks/${context.params.id}`, {
+  const r = await fetch(`${API}/tasks/${id}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -21,9 +21,13 @@ export async function DELETE(_req: NextRequest, context: RouteContext) {
   return NextResponse.json(data, { status: r.status });
 }
 
-export async function PUT(req: NextRequest, context: RouteContext) {
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
   const token = (await cookies()).get('access_token')?.value;
-  const body = await req.json();
+  const body = await request.json();
 
   const normalizeCategory = (c: unknown) => {
     if (typeof c !== 'string') return c as any;
@@ -46,7 +50,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
     ...(body?.startTime ? { startTime: body.startTime } : {}),
   };
 
-  const r = await fetch(`${API}/tasks/${context.params.id}`, {
+  const r = await fetch(`${API}/tasks/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',

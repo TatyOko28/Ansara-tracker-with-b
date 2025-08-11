@@ -2,14 +2,14 @@
 
 import Head from 'next/head';
 import Link from 'next/link';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { signInAction } from '@/app/actions/auth';
 
 type State = { ok?: boolean; error?: string | null };
 
-export default function SignIn() {
+function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const callbackUrl = params.get('callbackUrl') || '/tasks';
@@ -88,5 +88,17 @@ export default function SignIn() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <div className="text-white">Loading...</div>
+      </div>
+    }>
+      <SignInForm />
+    </Suspense>
   );
 }

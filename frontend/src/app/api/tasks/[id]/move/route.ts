@@ -1,17 +1,16 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-interface RouteContext {
-  params: { id: string };
-}
-
-export async function PATCH(req: NextRequest, context: RouteContext) {
-  const { id } = context.params;
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
 
   const token = (await cookies()).get('access_token')?.value;
-  const body = await req.json();
+  const body = await request.json();
 
   const normalizeCategory = (c: unknown) => {
     if (typeof c !== 'string') return c as any;
